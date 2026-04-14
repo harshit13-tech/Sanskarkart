@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🕉️ Sanskarkart</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --s:#E8660A;--sd:#B54D06;--sl:#FFF3E8;--sm:#FFD9B3;
+  --deep:#1E0F00;--mid:#5C3A1E;--muted:#8C6B52;--border:#EAD5C0;
+  --white:#FFFCF8;--surface:#FFF8F0;--card:#FFFDF9;
+  --green:#1B6B3A;--red:#B03020;
+  --gold:#D4A017;--gold-l:#FFF8E0;
+  --fh:'Crimson Pro',serif;--fb:'DM Sans',sans-serif;--fhi:'Tiro Devanagari Hindi',serif;
+  --r:12px;--rl:18px;--rxl:24px;
+  --sh:0 2px 16px rgba(232,102,10,.10);
+  --sh2:0 8px 40px rgba(232,102,10,.18);
+}
+body{font-family:var(--fb);background:var(--surface);color:var(--deep);min-height:100vh;font-size:15px;overflow-x:hidden}
+.hi{font-family:var(--fhi)!important}
+.pg{display:none;min-height:100vh;flex-direction:column;animation:fadeIn .35s ease}
+.pg.on{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--s),var(--gold));z-index:200}
+
+/* NAV */
+nav{background:rgba(255,252,248,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 1.75rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 12px rgba(0,0,0,.06)}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--s),var(--sd));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 8px rgba(232,102,10,.3)}
+.logo-text{font-family:var(--fh);font-size:1.5rem;font-weight:700;color:var(--deep)}
+.logo-text span{color:var(--s)}
+.nav-r{display:flex;align-items:center;gap:10px}
+.nav-name{font-size:14px;font-weight:500;color:var(--mid)}
+
+/* HAMBURGER */
+.hamburger{background:none;border:none;cursor:pointer;padding:8px;display:flex;flex-direction:column;justify-content:center;gap:5px;border-radius:8px;transition:background .2s}
+.hamburger:hover{background:var(--sl)}
+.hamburger span{display:block;width:22px;height:2px;background:var(--deep);border-radius:2px;transition:all .25s}
+
+/* SIDEBAR */
+#sidebar-overlay{position:fixed;inset:0;background:rgba(30,15,0,.45);z-index:300;opacity:0;pointer-events:none;transition:opacity .3s}
+#sidebar-overlay.open{opacity:1;pointer-events:all}
+#sidebar{position:fixed;top:0;left:0;height:100%;width:270px;background:var(--card);z-index:400;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 30px rgba(0,0,0,.15);display:flex;flex-direction:column;padding-top:3px}
+#sidebar.open{transform:translateX(0)}
+.sidebar-header{padding:1.5rem 1.5rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-logo{display:flex;align-items:center;gap:10px}
+.sidebar-logo .logo-icon{width:34px;height:34px;font-size:18px}
+.sidebar-logo .logo-text{font-size:1.25rem}
+.sidebar-close{background:none;border:none;cursor:pointer;font-size:22px;color:var(--muted);padding:4px;border-radius:6px;line-height:1;transition:color .2s}
+.sidebar-close:hover{color:var(--s)}
+.sidebar-nav{flex:1;padding:1rem 0;overflow-y:auto}
+.sidebar-link{display:flex;align-items:center;gap:12px;padding:13px 1.5rem;font-size:15px;font-weight:500;color:var(--deep);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all .18s;border-left:3px solid transparent;font-family:var(--fb)}
+.sidebar-link:hover{background:var(--sl);color:var(--s);border-left-color:var(--s)}
+.sidebar-link .sl-ico{font-size:18px;width:24px;text-align:center}
+.sidebar-footer{padding:1rem 1.5rem;border-top:1px solid var(--border)}
+.sidebar-link-logout{color:var(--red)!important}
+.sidebar-link-logout:hover{background:#FFF0EC!important;border-left-color:var(--red)!important}
+.sidebar-user{padding:0 1.5rem 1rem;font-size:14px;font-weight:600;color:var(--mid);border-bottom:1px solid var(--border);margin-bottom:.25rem;word-break:break-word}
+.sidebar-lang{padding-bottom:1rem;display:none}
+.sidebar-lang .lang-toggle{width:100%;justify-content:center}
+
+/* LANGUAGE TOGGLE */
+.lang-toggle{display:flex;align-items:center;background:var(--sl);border:1.5px solid var(--sm);border-radius:25px;padding:3px;gap:2px}
+.lang-btn{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s;background:none;color:var(--muted);font-family:var(--fb)}
+.lang-btn.active{background:var(--s);color:#fff;box-shadow:0 2px 6px rgba(232,102,10,.3)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:var(--r);font-family:var(--fb);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;border:none;text-decoration:none;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .2s}
+.btn:hover::after{background:rgba(255,255,255,.12)}
+.bp{background:linear-gradient(135deg,var(--s),var(--sd));color:#fff;box-shadow:0 4px 14px rgba(232,102,10,.35)}
+.bp:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,102,10,.45)}
+.bp:active{transform:translateY(0)}
+.bs{background:var(--white);color:var(--s);border:2px solid var(--s)}.bs:hover{background:var(--sl)}
+.bg{background:none;color:var(--muted);border:1.5px solid var(--border);font-family:var(--fb)}.bg:hover{background:var(--sl);border-color:var(--s);color:var(--s)}
+.bf{width:100%}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important}
+.btn-sm{padding:6px 14px;font-size:13px}
+
+/* FIELDS */
+.field{margin-bottom:1.2rem}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:var(--r);font-size:15px;font-family:var(--fb);background:var(--white);color:var(--deep);outline:none;transition:all .2s}
+.field textarea{resize:vertical;min-height:80px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--s);box-shadow:0 0 0 3px rgba(232,102,10,.1)}
+.field input::placeholder,.field textarea::placeholder{color:#C4A882}
+
+/* ALERTS */
+.alert{padding:12px 16px;border-radius:var(--r);font-size:13px;margin-bottom:1rem;display:none;animation:slideDown .25s ease}
+.alert.on{display:flex;align-items:center;gap:8px}
+.ae{background:#FFF0EC;color:var(--red);border:1px solid #FFCDC0}
+.as{background:#EDFBF3;color:var(--green);border:1px solid #B0E8C8}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* AUTH PAGES */
+.auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden}
+.auth-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 10%,#FFE8CC 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,#FFD9B0 0%,transparent 50%),var(--surface)}
+.auth-deco{position:absolute;font-size:8rem;opacity:.04;pointer-events:none;user-select:none}
+.auth-deco-1{top:-2rem;right:-1rem;transform:rotate(15deg)}
+.auth-deco-2{bottom:-2rem;left:-1rem;transform:rotate(-15deg)}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rxl);padding:2.75rem 2.5rem;width:100%;max-width:420px;box-shadow:var(--sh2);position:relative;z-index:1}
+.auth-om{text-align:center;margin-bottom:1rem}
+.auth-om-circle{width:68px;height:68px;background:linear-gradient(135deg,var(--s),var(--sd));border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 6px 20px rgba(232,102,10,.35)}
+.auth-card h1{font-family:var(--fh);font-size:2.1rem;font-weight:700;color:var(--deep);margin-bottom:4px;text-align:center}
+.auth-card .sub{font-size:14px;color:var(--muted);margin-bottom:2rem;text-align:center}
+.auth-sw{text-align:center;margin-top:1.25rem;font-size:14px;color:var(--muted)}
+.auth-sw a{color:var(--s);font-weight:600;cursor:pointer;text-decoration:none}
+.divider{display:flex;align-items:center;gap:12px;margin:1.25rem 0;color:var(--border)}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider span{font-size:12px;color:var(--muted);white-space:nowrap}
+
+/* DASHBOARD */
+.pbody{max-width:1020px;margin:0 auto;padding:2rem 1.75rem;width:100%}
+.welcome-card{border-radius:var(--rxl);padding:2rem 2.25rem;color:#fff;margin-bottom:2rem;position:relative;overflow:hidden;background:linear-gradient(135deg,#E8660A 0%,#B54D06 60%,#8B3A04 100%)}
+.welcome-card::before{content:'🕉️';position:absolute;right:-1rem;top:-1.5rem;font-size:9rem;opacity:.12;pointer-events:none}
+.welcome-card::after{content:'';position:absolute;bottom:-20px;left:-20px;width:200px;height:200px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none}
+.welcome-card h2{font-family:var(--fh);font-size:2rem;font-weight:700;margin-bottom:4px;position:relative}
+.welcome-card p{font-size:14px;opacity:.88;position:relative}
+.welcome-card .date-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 12px;font-size:12px;margin-bottom:.75rem;backdrop-filter:blur(4px)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;text-align:center;transition:all .2s;cursor:default;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--s));opacity:0;transition:opacity .2s}
+.stat:hover{box-shadow:var(--sh);transform:translateY(-2px)}.stat:hover::before{opacity:1}
+.stat .ico{font-size:1.5rem;margin-bottom:.4rem}
+.stat .n{font-family:var(--fh);font-size:2.4rem;font-weight:700;color:var(--s);line-height:1;margin-bottom:3px}
+.stat .l{font-size:12px;color:var(--muted);font-weight:500}
+.section-title{font-family:var(--fh);font-size:1.4rem;font-weight:700;margin-bottom:1.25rem;color:var(--deep);display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:2.5rem}
+.dcard{background:var(--card);border:1.5px solid var(--border);border-radius:var(--rl);padding:1.5rem;cursor:pointer;transition:all .22s;display:flex;flex-direction:column;align-items:flex-start;gap:.75rem;position:relative;overflow:hidden}
+.dcard::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--sl),transparent);opacity:0;transition:opacity .22s}
+.dcard:hover{box-shadow:var(--sh2);border-color:var(--s);transform:translateY(-3px)}.dcard:hover::before{opacity:1}
+.dcard:active{transform:translateY(-1px)}
+.dico{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--sl),#FFE8CC);display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;z-index:1;border:1.5px solid var(--sm)}
+.dcard h3{font-size:15px;font-weight:600;color:var(--deep);position:relative;z-index:1}
+.dcard p{font-size:12px;color:var(--muted);position:relative;z-index:1}
+.dcard .arrow{position:absolute;right:1.25rem;bottom:1.25rem;color:var(--s);font-size:18px;opacity:0;transform:translateX(-6px);transition:all .22s}
+.dcard:hover .arrow{opacity:1;transform:translateX(0)}
+.recent-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem;margin-bottom:2rem}
+.ri{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);transition:background .15s;border-radius:var(--r);padding-left:8px;padding-right:8px;margin:0 -8px}
+.ri:last-child{border:none}
+.ri:hover{background:var(--sl)}
+.av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--s),var(--sd));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 3px 8px rgba(232,102,10,.25)}
+.ri-name{font-size:14px;font-weight:600;color:var(--deep)}
+.ri-meta{font-size:12px;color:var(--muted);margin-top:1px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--gold-l);color:#8B6010;border:1px solid #E8D080}
+.badge-priest{background:#EDF5FF;color:#1A5DAD;border-color:#B0D0FF}
+
+/* DIRECTORY */
+.dir-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.dir-header h1{font-family:var(--fh);font-size:2.1rem;font-weight:700}
+.filters{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;box-shadow:var(--sh)}
+.filters .field{margin:0;flex:1;min-width:140px}
+.filters .field input,.filters .field select{font-size:14px;padding:9px 12px}
+.rc{font-size:13px;color:var(--muted);margin-bottom:1rem}
+.rc strong{color:var(--deep)}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+.bc{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;display:flex;flex-direction:column;gap:8px;transition:all .2s;position:relative;overflow:hidden}
+.bc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--s));opacity:0;transition:opacity .2s}
+.bc:hover{box-shadow:var(--sh2);transform:translateY(-2px);border-color:var(--sm)}.bc:hover::before{opacity:1}
+.bc-top{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.bc-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--s),var(--sd));display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 3px 10px rgba(232,102,10,.25)}
+.bc-av-priest{background:linear-gradient(135deg,#2563EB,#1A3A8F)!important}
+.bc-name{font-family:var(--fh);font-size:1.15rem;font-weight:700;color:var(--deep);line-height:1.2}
+.brow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.brow svg{flex-shrink:0;color:var(--s);opacity:.7}
+.brow a{color:var(--s);text-decoration:none}.brow a:hover{text-decoration:underline}
+.empty{grid-column:1/-1;text-align:center;padding:4rem 1rem;color:var(--muted)}
+.empty .ico{font-size:3.5rem;margin-bottom:1rem;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ADD FORM */
+.form-wrap{max-width:580px}
+.form-wrap h1{font-family:var(--fh);font-size:2rem;font-weight:700;margin-bottom:4px}
+.form-wrap .sub{font-size:14px;color:var(--muted);margin-bottom:1.75rem}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 1.25rem}
+.fgrid .field.full{grid-column:1/-1}
+.factions{display:flex;gap:12px;margin-top:1.75rem}
+.factions .btn{flex:1}
+
+/* BACK */
+.back{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);cursor:pointer;margin-bottom:1.75rem;background:none;border:none;font-family:var(--fb);padding:6px 10px 6px 0;transition:color .15s}
+.back:hover{color:var(--s)}
+
+/* SPINNER */
+.sp{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOADER */
+#init-loader{position:fixed;inset:0;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:1.25rem}
+.loader-om{font-size:4rem;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.92)}}
+.loader-bar{width:180px;height:3px;background:var(--border);border-radius:3px;overflow:hidden}
+.loader-bar-inner{height:100%;background:linear-gradient(90deg,var(--gold),var(--s));border-radius:3px;animation:load 1.8s ease-in-out infinite}
+@keyframes load{0%{width:0;margin-left:0}50%{width:100%}100%{width:0;margin-left:100%}}
+#init-loader p{font-family:var(--fh);font-size:1.25rem;color:var(--muted)}
+
+/* TOAST */
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--deep);color:#fff;padding:12px 24px;border-radius:25px;font-size:14px;font-weight:500;z-index:500;transition:transform .3s;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* SPECIALIZATION TAGS */
+.spec-tag{display:inline-block;padding:3px 9px;border-radius:14px;font-size:11px;font-weight:600;background:#EDF5FF;color:#1A5DAD;border:1px solid #B0D0FF;margin:2px 2px 2px 0}
+.avail-tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;background:var(--gold-l);color:#8B6010;border:1px solid #E8D080;margin:2px 2px 2px 0}
+
+@media(max-width:600px){
+  .stats{gap:.75rem}.stat .n{font-size:1.8rem}
+  .fgrid{grid-template-columns:1fr}.fgrid .field.full{grid-column:1}
+  .pbody{padding:1.25rem 1rem}
+  nav{padding:0 1rem}
+  .auth-card{padding:2rem 1.5rem}
+  .welcome-card{padding:1.5rem}
+  .welcome-card h2{font-size:1.6rem}
+  #sidebar{width:85vw}
+}
+@media(max-width:768px){
+  nav{height:auto;min-height:64px;padding:.75rem 1rem;gap:.75rem;align-items:center}
+  .logo-text{font-size:1.2rem}
+  .nav-r{display:none}
+  .sidebar-lang{display:block}
+  .stats,.dgrid,.bgrid,.fgrid{grid-template-columns:1fr}
+  .dir-header,.filters,.factions,.ri,.bc-top,.brow{flex-direction:column;align-items:stretch}
+  .dir-header h1,.form-wrap h1{font-size:1.7rem}
+  .filters{padding:1rem;gap:.9rem}
+  .filters .field,.filters .btn,.factions .btn,.dir-header .btn{width:100%;min-width:0}
+  .filters .field input,.filters .field select{width:100%}
+  .factions{margin-top:1.25rem}
+  .ri,.bc-top{gap:10px}
+  .badge{align-self:flex-start}
+  .section-title{font-size:1.2rem}
+  .section-title::after{display:none}
+  #pa-spec-checks,#pa-days-checks{flex-direction:column!important;align-items:stretch}
+  #pa-spec-checks label,#pa-days-checks label{width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo logo">
+      <div class="logo-icon">🕉️</div>
+      <div class="logo-text">Sanskar<span>kart</span></div>
+    </div>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <div class="sidebar-user" id="sidebar-user-name"></div>
+  <nav class="sidebar-nav">
+    <button class="sidebar-link" onclick="sidebarNav('pg-dash')">
+      <span class="sl-ico">🏠</span><span class="sl-lbl" id="sb-dashboard">Dashboard</span>
+    </button>
+    <button class="sidebar-link" onclick="sidebarNav('pg-dir')">
+      <span class="sl-ico">📋</span><span class="sl-lbl" id="sb-directory">View Directory</span>
+    </button>
+    <button class="sidebar-link" onclick="sidebarNav('pg-priest')">
+      <span class="sl-ico">🔱</span><span class="sl-lbl" id="sb-priest">Priest Directory</span>
+    </button>
+    <button class="sidebar-link" onclick="sidebarNav('pg-add')">
+      <span class="sl-ico">✍️</span><span class="sl-lbl" id="sb-add">Add Your Name</span>
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-lang">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('hi')">हि</button>
+      </div>
+    </div>
+    <button class="sidebar-link sidebar-link-logout" onclick="doLogout();closeSidebar()">
+      <span class="sl-ico">🚪</span><span class="sl-lbl" id="sb-logout">Logout</span>
+    </button>
+  </div>
+</div>
+
+<div id="init-loader">
+  <div class="loader-om">🕉️</div>
+  <p id="loader-text">Loading Sanskarkart...</p>
+  <div class="loader-bar"><div class="loader-bar-inner"></div></div>
+</div>
+<div id="toast"></div>
+
+<!-- ══ LOGIN ══ -->
+<div class="pg" id="pg-login">
+  <div class="auth-wrap">
+    <div class="auth-bg"></div>
+    <div class="auth-deco auth-deco-1">🕉️</div>
+    <div class="auth-deco auth-deco-2">🪔</div>
+    <div class="auth-card">
+      <div class="auth-om"><div class="auth-om-circle">🕉️</div></div>
+      <h1 id="l-title">Sanskarkart</h1>
+      <p class="sub" id="l-sub">Sign in to access the community directory</p>
+      <div style="display:flex;justify-content:center;margin-bottom:1.5rem">
+        <div class="lang-toggle">
+          <button class="lang-btn active" onclick="setLang('en')">English</button>
+          <button class="lang-btn" onclick="setLang('hi')">हिंदी</button>
+        </div>
+      </div>
+      <div id="login-alert" class="alert"></div>
+      <div class="field"><label id="l-ph-lbl">Mobile Number</label>
+        <input type="tel" id="l-phone" placeholder="10-digit number" maxlength="10" inputmode="numeric"/></div>
+      <div class="field"><label id="l-pw-lbl">Password</label>
+        <input type="password" id="l-pass" placeholder="Your password"/></div>
+      <button class="btn bp bf" id="l-btn" onclick="doLogin()">Sign In</button>
+      <p class="auth-sw" id="l-sw">New here? <a onclick="show('pg-register')">Create account</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REGISTER ══ -->
+<div class="pg" id="pg-register">
+  <div class="auth-wrap">
+    <div class="auth-bg"></div>
+    <div class="auth-deco auth-deco-1">🪔</div>
+    <div class="auth-deco auth-deco-2">🕉️</div>
+    <div class="auth-card">
+      <div class="auth-om"><div class="auth-om-circle">🙏</div></div>
+      <h1 id="r-title">Create Account</h1>
+      <p class="sub" id="r-sub">Join the Brahmin community directory</p>
+      <div id="reg-alert" class="alert"></div>
+      <div class="field"><label id="r-nm-lbl">Full Name *</label>
+        <input type="text" id="r-name" placeholder="Your full name"/></div>
+      <div class="field"><label id="r-ph-lbl">Mobile Number *</label>
+        <input type="tel" id="r-phone" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric"/></div>
+      <div class="field"><label id="r-pw-lbl">Password *</label>
+        <input type="password" id="r-pass" placeholder="At least 6 characters"/></div>
+      <div class="field"><label id="r-cp-lbl">Confirm Password *</label>
+        <input type="password" id="r-conf" placeholder="Re-enter password"/></div>
+      <button class="btn bp bf" id="r-btn" onclick="doRegister()">Create Account</button>
+      <p class="auth-sw" id="r-sw">Already have an account? <a onclick="show('pg-login')">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div class="pg" id="pg-dash">
+  <nav>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="logo" onclick="show('pg-dash')">
+        <div class="logo-icon">🕉️</div>
+        <div class="logo-text">Sanskar<span>kart</span></div>
+      </div>
+    </div>
+    <div class="nav-r">
+      <span class="nav-name" id="d-uname"></span>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('hi')">हि</button>
+      </div>
+      <button class="btn bg btn-sm" onclick="doLogout()" id="d-logout-btn">Logout</button>
+    </div>
+  </nav>
+  <div class="pbody">
+    <div class="welcome-card">
+      <div class="date-badge">🗓️ <span id="d-date"></span></div>
+      <h2 id="d-welcome">Welcome! 🙏</h2>
+      <p id="d-sub-txt">Manage and explore the Brahmin community directory across India</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="ico">👥</div><div class="n" id="s-total">—</div><div class="l" id="s-total-lbl">Total Members</div></div>
+      <div class="stat"><div class="ico">🏙️</div><div class="n" id="s-cities">—</div><div class="l" id="s-cities-lbl">Cities</div></div>
+      <div class="stat"><div class="ico">🗺️</div><div class="n" id="s-states">—</div><div class="l" id="s-states-lbl">States</div></div>
+    </div>
+    <div class="section-title" id="d-quick-lbl">Quick Actions</div>
+    <div class="dgrid">
+      <div class="dcard" onclick="show('pg-dir')">
+        <div class="dico">📋</div>
+        <div><h3 id="dc1-t">View Directory</h3><p id="dc1-p">Browse all registered Brahmins</p></div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="dcard" onclick="show('pg-priest')">
+        <div class="dico">🔱</div>
+        <div><h3 id="dc4-t">Priest Directory</h3><p id="dc4-p">Find & register priests for puja</p></div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="dcard" onclick="show('pg-add')">
+        <div class="dico">✍️</div>
+        <div><h3 id="dc2-t">Add Your Name</h3><p id="dc2-p">Register yourself in the directory</p></div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="dcard" onclick="show('pg-dir')">
+        <div class="dico">🔍</div>
+        <div><h3 id="dc3-t">Search by City</h3><p id="dc3-p">Find Brahmins in your city</p></div>
+        <div class="arrow">→</div>
+      </div>
+    </div>
+    <div class="recent-card">
+      <div class="section-title" id="d-recent-lbl">Recent Additions</div>
+      <div id="d-recent"><p style="font-size:14px;color:var(--muted)">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DIRECTORY ══ -->
+<div class="pg" id="pg-dir">
+  <nav>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="logo" onclick="show('pg-dash')">
+        <div class="logo-icon">🕉️</div>
+        <div class="logo-text">Sanskar<span>kart</span></div>
+      </div>
+    </div>
+    <div class="nav-r">
+      <span class="nav-name" id="dir-uname"></span>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('hi')">हि</button>
+      </div>
+      <button class="btn bg btn-sm" onclick="doLogout()" id="dir-logout-btn">Logout</button>
+    </div>
+  </nav>
+  <div class="pbody">
+    <button class="back" onclick="show('pg-dash')">← <span id="dir-back-lbl">Back to Dashboard</span></button>
+    <div class="dir-header">
+      <h1 id="dir-title">Community Directory</h1>
+      <button class="btn bp" onclick="show('pg-add')" id="dir-add-btn">✍️ Add Your Name</button>
+    </div>
+    <div class="filters">
+      <div class="field"><label id="f-name-lbl">Search Name</label>
+        <input type="text" id="f-name" placeholder="Type a name..." oninput="filterDir()"/></div>
+      <div class="field"><label id="f-city-lbl">City</label>
+        <select id="f-city" onchange="filterDir()"><option value="">All Cities</option></select></div>
+      <div class="field"><label id="f-gotra-lbl">Gotra</label>
+        <select id="f-gotra" onchange="filterDir()"><option value="">All Gotras</option></select></div>
+      <div class="field"><label id="f-state-lbl">State</label>
+        <select id="f-state" onchange="filterDir()"><option value="">All States</option></select></div>
+      <div class="field"><label id="f-type-lbl">Brahmin Type</label>
+        <select id="f-type" onchange="filterDir()"><option value="">All Types</option></select></div>
+      <button class="btn bg btn-sm" style="align-self:flex-end;padding:9px 16px" onclick="clearFilters()" id="f-clear-btn">Clear</button>
+    </div>
+    <div class="rc" id="dir-rc"></div>
+    <div class="bgrid" id="dir-grid"><div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">Loading...</div></div>
+  </div>
+</div>
+
+<!-- ══ ADD ══ -->
+<div class="pg" id="pg-add">
+  <nav>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="logo" onclick="show('pg-dash')">
+        <div class="logo-icon">🕉️</div>
+        <div class="logo-text">Sanskar<span>kart</span></div>
+      </div>
+    </div>
+    <div class="nav-r">
+      <span class="nav-name" id="add-uname"></span>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('hi')">हि</button>
+      </div>
+      <button class="btn bg btn-sm" onclick="doLogout()" id="add-logout-btn">Logout</button>
+    </div>
+  </nav>
+  <div class="pbody">
+    <button class="back" onclick="show('pg-dash')">← <span id="add-back-lbl">Back to Dashboard</span></button>
+    <div class="form-wrap">
+      <h1 id="add-title">Add Your Details</h1>
+      <p class="sub" id="add-sub">Register yourself in the Brahmin community directory</p>
+      <div id="add-alert" class="alert"></div>
+      <div class="fgrid">
+        <div class="field full"><label id="a-nm-lbl">Full Name *</label><input type="text" id="a-name" placeholder="Your full name"/></div>
+        <div class="field"><label id="a-gt-lbl">Gotra *</label><input type="text" id="a-gotra" placeholder="e.g. Kashyap"/></div>
+        <div class="field"><label id="a-mb-lbl">Mobile Number *</label><input type="tel" id="a-mobile" placeholder="10-digit number" maxlength="10" inputmode="numeric"/></div>
+        <div class="field"><label id="a-ct-lbl">City *</label><input type="text" id="a-city" placeholder="Your city"/></div>
+        <div class="field"><label id="a-st-lbl">State</label>
+          <select id="a-state"><option value="">Select state</option>
+            <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+            <option>Bihar</option><option>Chhattisgarh</option><option>Delhi</option>
+            <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+            <option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option>
+            <option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option>
+            <option>Manipur</option><option>Meghalaya</option><option>Odisha</option>
+            <option>Punjab</option><option>Rajasthan</option><option>Tamil Nadu</option>
+            <option>Telangana</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+            <option>West Bengal</option>
+          </select></div>
+        <div class="field full"><label id="a-tp-lbl">Brahmin Type</label>
+          <select id="a-type"><option value="">Select type</option></select></div>
+        <div class="field full"><label id="a-em-lbl">Email Address</label><input type="email" id="a-email" placeholder="Optional"/></div>
+        <div class="field"><label id="a-oc-lbl">Occupation</label><input type="text" id="a-occ" placeholder="e.g. Priest, Teacher"/></div>
+        <div class="field"><label id="a-ad-lbl">Area / Address</label><input type="text" id="a-addr" placeholder="Locality or area"/></div>
+      </div>
+      <div class="factions">
+        <button class="btn bs" onclick="show('pg-dash')" id="a-cancel-btn">Cancel</button>
+        <button class="btn bp" id="a-btn" onclick="doAdd()">✍️ Add to Directory</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PRIEST DIRECTORY ══ -->
+<div class="pg" id="pg-priest">
+  <nav>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="logo" onclick="show('pg-dash')">
+        <div class="logo-icon">🕉️</div>
+        <div class="logo-text">Sanskar<span>kart</span></div>
+      </div>
+    </div>
+    <div class="nav-r">
+      <span class="nav-name" id="priest-uname"></span>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('hi')">हि</button>
+      </div>
+      <button class="btn bg btn-sm" onclick="doLogout()" id="priest-logout-btn">Logout</button>
+    </div>
+  </nav>
+  <div class="pbody">
+    <button class="back" onclick="show('pg-dash')">← <span id="priest-back-lbl">Back to Dashboard</span></button>
+    <div class="dir-header">
+      <h1 id="priest-title">🔱 Priest Directory</h1>
+      <button class="btn bp" onclick="show('pg-priest-add')" id="priest-reg-btn">🔱 Register as Priest</button>
+    </div>
+    <!-- Priest Search Filters -->
+    <div class="filters">
+      <div class="field"><label id="pf-name-lbl">Search Name</label>
+        <input type="text" id="pf-name" placeholder="Type a name..." oninput="filterPriests()"/></div>
+      <div class="field"><label id="pf-city-lbl">City</label>
+        <select id="pf-city" onchange="filterPriests()"><option value="">All Cities</option></select></div>
+      <div class="field"><label id="pf-state-lbl">State</label>
+        <select id="pf-state" onchange="filterPriests()"><option value="">All States</option></select></div>
+      <div class="field"><label id="pf-spec-lbl">Specialization</label>
+        <select id="pf-spec" onchange="filterPriests()"><option value="">All Specializations</option></select></div>
+      <button class="btn bg btn-sm" style="align-self:flex-end;padding:9px 16px" onclick="clearPriestFilters()" id="pf-clear-btn">Clear</button>
+    </div>
+    <div class="rc" id="priest-rc"></div>
+    <div class="bgrid" id="priest-grid"><div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">Loading...</div></div>
+  </div>
+</div>
+
+<!-- ══ PRIEST REGISTER ══ -->
+<div class="pg" id="pg-priest-add">
+  <nav>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="logo" onclick="show('pg-dash')">
+        <div class="logo-icon">🕉️</div>
+        <div class="logo-text">Sanskar<span>kart</span></div>
+      </div>
+    </div>
+    <div class="nav-r">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('hi')">हि</button>
+      </div>
+      <button class="btn bg btn-sm" onclick="doLogout()" id="priestadd-logout-btn">Logout</button>
+    </div>
+  </nav>
+  <div class="pbody">
+    <button class="back" onclick="show('pg-priest')">← <span id="priestadd-back-lbl">Back to Priest Directory</span></button>
+    <div class="form-wrap">
+      <h1 id="priestadd-title">Register as Priest</h1>
+      <p class="sub" id="priestadd-sub">List your profile so devotees can find and contact you</p>
+      <div id="priestadd-alert" class="alert"></div>
+      <div class="fgrid">
+        <div class="field full"><label id="pa-nm-lbl">Full Name *</label><input type="text" id="pa-name" placeholder="Pandit / Acharya name"/></div>
+        <div class="field"><label id="pa-gt-lbl">Gotra *</label><input type="text" id="pa-gotra" placeholder="e.g. Kashyap"/></div>
+        <div class="field"><label id="pa-mb-lbl">Mobile Number *</label><input type="tel" id="pa-mobile" placeholder="10-digit number" maxlength="10" inputmode="numeric"/></div>
+        <div class="field"><label id="pa-ct-lbl">City *</label><input type="text" id="pa-city" placeholder="Your city"/></div>
+        <div class="field"><label id="pa-st-lbl">State</label>
+          <select id="pa-state"><option value="">Select state</option>
+            <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+            <option>Bihar</option><option>Chhattisgarh</option><option>Delhi</option>
+            <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+            <option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option>
+            <option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option>
+            <option>Manipur</option><option>Meghalaya</option><option>Odisha</option>
+            <option>Punjab</option><option>Rajasthan</option><option>Tamil Nadu</option>
+            <option>Telangana</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+            <option>West Bengal</option>
+          </select></div>
+        <div class="field"><label id="pa-exp-lbl">Experience (Years)</label><input type="number" id="pa-exp" placeholder="e.g. 10" min="0" max="80"/></div>
+        <div class="field full"><label id="pa-spec-lbl">Specializations *</label>
+          <div id="pa-spec-checks" style="display:flex;flex-wrap:wrap;gap:10px;padding:10px 0"></div>
+        </div>
+        <div class="field full"><label id="pa-days-lbl">Available Days</label>
+          <div id="pa-days-checks" style="display:flex;flex-wrap:wrap;gap:10px;padding:10px 0"></div>
+        </div>
+      </div>
+      <div class="factions">
+        <button class="btn bs" onclick="show('pg-priest')" id="pa-cancel-btn">Cancel</button>
+        <button class="btn bp" id="pa-btn" onclick="doPriestAdd()">🔱 Register as Priest</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// ✅ YOUR FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyCk-A_35X7n25N1y3XIEICiRXq0kuJlOfE",
+  authDomain: "brahmin-directory.firebaseapp.com",
+  projectId: "brahmin-directory",
+  storageBucket: "brahmin-directory.firebasestorage.app",
+  messagingSenderId: "826753339652",
+  appId: "1:826753339652:web:087a87bef158f3bb950051"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+let currentUser = null;
+let allBrahmins = [];
+let allPriests  = [];
+let currentLang = 'en';
+
+// ── BRAHMIN TYPES ─────────────────────────────────────────────
+const BRAHMIN_TYPES_EN = [
+  'Maithili Brahmin','Bengali Brahmin','Tamil Brahmin','Telugu Brahmin',
+  'Kashmiri Brahmin','Kannada Brahmin','Maharashtra Brahmin','Gujarat Brahmin',
+  'Punjabi Brahmin','UP Brahmin','Bihar Brahmin','Rajasthani Brahmin'
+];
+const BRAHMIN_TYPES_HI = [
+  'मैथिली ब्राह्मण','बंगाली ब्राह्मण','तमिल ब्राह्मण','तेलुगु ब्राह्मण',
+  'कश्मीरी ब्राह्मण','कन्नड़ ब्राह्मण','महाराष्ट्र ब्राह्मण','गुजरात ब्राह्मण',
+  'पंजाबी ब्राह्मण','यूपी ब्राह्मण','बिहार ब्राह्मण','राजस्थानी ब्राह्मण'
+];
+
+// ── PRIEST SPECIALIZATIONS ────────────────────────────────────
+const SPECIALIZATIONS = [
+  { en:'Vivah Puja / विवाह पूजा', hi:'विवाह पूजा' },
+  { en:'Satyanarayan Katha', hi:'सत्यनारायण कथा' },
+  { en:'Griha Pravesh', hi:'गृह प्रवेश' },
+  { en:'Antyesti', hi:'अंत्येष्टि' },
+  { en:'Navgrah Puja', hi:'नवग्रह पूजा' },
+  { en:'Janamdin Puja', hi:'जन्मदिन पूजा' },
+  { en:'Mundan Sanskar', hi:'मुंडन संस्कार' },
+  { en:'Namkaran Puja', hi:'नामकरण पूजा' },
+];
+const DAYS = [
+  { en:'Monday', hi:'सोमवार' },
+  { en:'Tuesday', hi:'मंगलवार' },
+  { en:'Wednesday', hi:'बुधवार' },
+  { en:'Thursday', hi:'गुरुवार' },
+  { en:'Friday', hi:'शुक्रवार' },
+  { en:'Saturday', hi:'शनिवार' },
+  { en:'Sunday', hi:'रविवार' },
+];
+
+// ── TRANSLATIONS ─────────────────────────────────────────────
+const T = {
+  en: {
+    loaderText: 'Loading Sanskarkart...',
+    loginTitle: 'Sanskarkart', loginSub: 'Sign in to access the community directory',
+    lPhLbl: 'Mobile Number', lPwLbl: 'Password', lBtn: 'Sign In',
+    lSw: 'New here? <a onclick="show(\'pg-register\')">Create account</a>',
+    regTitle: 'Create Account', regSub: 'Join the Brahmin community directory',
+    rNmLbl: 'Full Name *', rPhLbl: 'Mobile Number *', rPwLbl: 'Password *', rCpLbl: 'Confirm Password *',
+    rBtn: 'Create Account', rSw: 'Already have an account? <a onclick="show(\'pg-login\')">Sign in</a>',
+    dSubTxt: 'Manage and explore the Brahmin community directory across India',
+    dQuickLbl: 'Quick Actions', dRecentLbl: 'Recent Additions',
+    sTotalLbl: 'Total Members', sCitiesLbl: 'Cities', sStatesLbl: 'States',
+    dc1T: 'View Directory', dc1P: 'Browse all registered Brahmins',
+    dc2T: 'Add Your Name', dc2P: 'Register yourself in the directory',
+    dc3T: 'Search by City', dc3P: 'Find Brahmins in your city',
+    dc4T: 'Priest Directory', dc4P: 'Find & register priests for puja',
+    logout: 'Logout', backDash: 'Back to Dashboard',
+    dirTitle: 'Community Directory', dirAddBtn: '✍️ Add Your Name',
+    fNameLbl: 'Search Name', fCityLbl: 'City', fGotraLbl: 'Gotra', fStateLbl: 'State',
+    fTypeLbl: 'Brahmin Type', fClearBtn: 'Clear',
+    addTitle: 'Add Your Details', addSub: 'Register yourself in the Brahmin community directory',
+    aNmLbl: 'Full Name *', aGtLbl: 'Gotra *', aMbLbl: 'Mobile Number *', aCtLbl: 'City *',
+    aStLbl: 'State', aTpLbl: 'Brahmin Type', aEmLbl: 'Email Address', aOcLbl: 'Occupation', aAdLbl: 'Area / Address',
+    aBtn: '✍️ Add to Directory', aCancelBtn: 'Cancel',
+    priestTitle: '🔱 Priest Directory', priestRegBtn: '🔱 Register as Priest',
+    priestBackLbl: 'Back to Priest Directory',
+    pfNameLbl: 'Search Name', pfCityLbl: 'City', pfStateLbl: 'State', pfSpecLbl: 'Specialization', pfClearBtn: 'Clear',
+    priestaddTitle: 'Register as Priest', priestaddSub: 'List your profile so devotees can find and contact you',
+    paNmLbl: 'Full Name *', paGtLbl: 'Gotra *', paMbLbl: 'Mobile Number *', paCtLbl: 'City *',
+    paStLbl: 'State', paExpLbl: 'Experience (Years)', paSpecLbl: 'Specializations *', paDaysLbl: 'Available Days',
+    paBtn: '🔱 Register as Priest', paCancelBtn: 'Cancel',
+    sbDashboard: 'Dashboard', sbDirectory: 'View Directory', sbPriest: 'Priest Directory',
+    sbAdd: 'Add Your Name', sbLogout: 'Logout',
+    errPhone: 'Enter a valid 10-digit mobile number.',
+    errPass: 'Please enter your password.',
+    errName: 'Please enter your full name.',
+    errPass6: 'Password must be at least 6 characters.',
+    errMatch: 'Passwords do not match.',
+    errGotra: 'Gotra is required.',
+    errCity: 'City is required.',
+    errPhoneAdd: 'Enter a valid 10-digit mobile number.',
+    errSpecPriest: 'Please select at least one specialization.',
+    invalidCred: 'Invalid number or password. Please try again.',
+    loginFail: 'Login failed: ',
+    alreadyReg: 'This number is already registered. Please sign in.',
+    regFail: 'Registration failed: ',
+    addSuccess: '✓ Your details have been added successfully! 🙏',
+    addFail: 'Failed to add. Error: ',
+    priestAddSuccess: '✓ Your priest profile has been registered! 🙏',
+    priestAddFail: 'Failed to register. Error: ',
+    noEntries: 'No entries yet. Be the first!',
+    noResults: 'No entries found. Try adjusting your filters.',
+    noPriests: 'No priests registered yet.',
+    noPriestResults: 'No priests found. Try adjusting your filters.',
+    showing: 'Showing', of: 'of', members: 'members',
+    priests: 'priests',
+    welcomePrefix: 'Welcome, ', welcomeSuffix: '! 🙏',
+    expYears: 'yrs exp', available: 'Available:',
+  },
+  hi: {
+    loaderText: 'संस्कारकार्त लोड हो रही है...',
+    loginTitle: 'संस्कारकार्त', loginSub: 'समुदाय निर्देशिका तक पहुँचने के लिए साइन इन करें',
+    lPhLbl: 'मोबाइल नंबर', lPwLbl: 'पासवर्ड', lBtn: 'साइन इन करें',
+    lSw: 'नए हैं? <a onclick="show(\'pg-register\')">खाता बनाएं</a>',
+    regTitle: 'खाता बनाएं', regSub: 'ब्राह्मण समुदाय निर्देशिका से जुड़ें',
+    rNmLbl: 'पूरा नाम *', rPhLbl: 'मोबाइल नंबर *', rPwLbl: 'पासवर्ड *', rCpLbl: 'पासवर्ड की पुष्टि करें *',
+    rBtn: 'खाता बनाएं', rSw: 'पहले से खाता है? <a onclick="show(\'pg-login\')">साइन इन करें</a>',
+    dSubTxt: 'पूरे भारत में ब्राह्मण समुदाय निर्देशिका का प्रबंधन करें',
+    dQuickLbl: 'त्वरित क्रियाएं', dRecentLbl: 'हाल की प्रविष्टियाँ',
+    sTotalLbl: 'कुल सदस्य', sCitiesLbl: 'शहर', sStatesLbl: 'राज्य',
+    dc1T: 'निर्देशिका देखें', dc1P: 'सभी पंजीकृत ब्राह्मणों को देखें',
+    dc2T: 'अपना नाम जोड़ें', dc2P: 'निर्देशिका में स्वयं को पंजीकृत करें',
+    dc3T: 'शहर से खोजें', dc3P: 'अपने शहर में ब्राह्मण खोजें',
+    dc4T: 'पुजारी निर्देशिका', dc4P: 'पूजा के लिए पुजारी खोजें व पंजीकरण करें',
+    logout: 'लॉग आउट', backDash: 'डैशबोर्ड पर वापस',
+    dirTitle: 'समुदाय निर्देशिका', dirAddBtn: '✍️ अपना नाम जोड़ें',
+    fNameLbl: 'नाम खोजें', fCityLbl: 'शहर', fGotraLbl: 'गोत्र', fStateLbl: 'राज्य',
+    fTypeLbl: 'ब्राह्मण प्रकार', fClearBtn: 'साफ करें',
+    addTitle: 'अपना विवरण जोड़ें', addSub: 'ब्राह्मण समुदाय निर्देशिका में स्वयं को पंजीकृत करें',
+    aNmLbl: 'पूरा नाम *', aGtLbl: 'गोत्र *', aMbLbl: 'मोबाइल नंबर *', aCtLbl: 'शहर *',
+    aStLbl: 'राज्य', aTpLbl: 'ब्राह्मण प्रकार', aEmLbl: 'ईमेल पता', aOcLbl: 'व्यवसाय', aAdLbl: 'क्षेत्र / पता',
+    aBtn: '✍️ निर्देशिका में जोड़ें', aCancelBtn: 'रद्द करें',
+    priestTitle: '🔱 पुजारी निर्देशिका', priestRegBtn: '🔱 पुजारी के रूप में पंजीकरण करें',
+    priestBackLbl: 'पुजारी निर्देशिका पर वापस',
+    pfNameLbl: 'नाम खोजें', pfCityLbl: 'शहर', pfStateLbl: 'राज्य', pfSpecLbl: 'विशेषज्ञता', pfClearBtn: 'साफ करें',
+    priestaddTitle: 'पुजारी के रूप में पंजीकरण करें', priestaddSub: 'अपनी प्रोफ़ाइल सूचीबद्ध करें ताकि भक्त आपसे संपर्क कर सकें',
+    paNmLbl: 'पूरा नाम *', paGtLbl: 'गोत्र *', paMbLbl: 'मोबाइल नंबर *', paCtLbl: 'शहर *',
+    paStLbl: 'राज्य', paExpLbl: 'अनुभव (वर्ष)', paSpecLbl: 'विशेषज्ञताएं *', paDaysLbl: 'उपलब्ध दिन',
+    paBtn: '🔱 पुजारी के रूप में पंजीकरण करें', paCancelBtn: 'रद्द करें',
+    sbDashboard: 'डैशबोर्ड', sbDirectory: 'निर्देशिका देखें', sbPriest: 'पुजारी निर्देशिका',
+    sbAdd: 'अपना नाम जोड़ें', sbLogout: 'लॉग आउट',
+    errPhone: 'वैध 10 अंकों का मोबाइल नंबर दर्ज करें।',
+    errPass: 'कृपया अपना पासवर्ड दर्ज करें।',
+    errName: 'कृपया अपना पूरा नाम दर्ज करें।',
+    errPass6: 'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।',
+    errMatch: 'पासवर्ड मेल नहीं खाते।',
+    errGotra: 'गोत्र आवश्यक है।',
+    errCity: 'शहर आवश्यक है।',
+    errPhoneAdd: 'वैध 10 अंकों का मोबाइल नंबर दर्ज करें।',
+    errSpecPriest: 'कृपया कम से कम एक विशेषज्ञता चुनें।',
+    invalidCred: 'गलत नंबर या पासवर्ड। कृपया पुनः प्रयास करें।',
+    loginFail: 'लॉगिन विफल: ',
+    alreadyReg: 'यह नंबर पहले से पंजीकृत है। कृपया साइन इन करें।',
+    regFail: 'पंजीकरण विफल: ',
+    addSuccess: '✓ आपका विवरण सफलतापूर्वक जोड़ा गया! 🙏',
+    addFail: 'जोड़ने में विफल। त्रुटि: ',
+    priestAddSuccess: '✓ आपकी पुजारी प्रोफ़ाइल पंजीकृत हो गई! 🙏',
+    priestAddFail: 'पंजीकरण विफल। त्रुटि: ',
+    noEntries: 'अभी तक कोई प्रविष्टि नहीं। पहले बनें!',
+    noResults: 'कोई परिणाम नहीं मिला। फ़िल्टर बदलें।',
+    noPriests: 'अभी तक कोई पुजारी पंजीकृत नहीं।',
+    noPriestResults: 'कोई पुजारी नहीं मिला। फ़िल्टर बदलें।',
+    showing: 'दिखाया जा रहा है', of: 'में से', members: 'सदस्य',
+    priests: 'पुजारी',
+    welcomePrefix: 'स्वागत है, ', welcomeSuffix: '! 🙏',
+    expYears: 'वर्ष अनुभव', available: 'उपलब्ध:',
+  }
+};
+
+// ── SIDEBAR ───────────────────────────────────────────────────
+window.openSidebar = function() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+window.closeSidebar = function() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+};
+window.sidebarNav = function(page) {
+  closeSidebar();
+  show(page);
+};
+
+// ── BRAHMIN TYPE SELECT POPULATION ────────────────────────────
+function populateBrahminTypeSelects() {
+  const types = currentLang === 'hi' ? BRAHMIN_TYPES_HI : BRAHMIN_TYPES_EN;
+  // Add form
+  const aType = document.getElementById('a-type');
+  const cur = aType.value;
+  aType.innerHTML = `<option value="">${currentLang==='hi'?'प्रकार चुनें':'Select type'}</option>` +
+    types.map((t,i)=>`<option value="${BRAHMIN_TYPES_EN[i]}"${BRAHMIN_TYPES_EN[i]===cur?' selected':''}>${t}</option>`).join('');
+  // Filter select
+  const fType = document.getElementById('f-type');
+  const cur2 = fType.value;
+  fType.innerHTML = `<option value="">${currentLang==='hi'?'सभी प्रकार':'All Types'}</option>` +
+    types.map((t,i)=>`<option value="${BRAHMIN_TYPES_EN[i]}"${BRAHMIN_TYPES_EN[i]===cur2?' selected':''}>${t}</option>`).join('');
+}
+
+// ── PRIEST SPECIALIZATION CHECKBOXES ─────────────────────────
+function buildSpecCheckboxes() {
+  const container = document.getElementById('pa-spec-checks');
+  container.innerHTML = SPECIALIZATIONS.map((sp,i) => {
+    const lbl = currentLang==='hi' ? sp.hi : sp.en;
+    return `<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);transition:all .15s" onmouseover="this.style.borderColor='var(--s)'" onmouseout="this.style.borderColor=document.getElementById('pa-spec-${i}').checked?'var(--s)':'var(--border)'"><input type="checkbox" id="pa-spec-${i}" value="${sp.en}" style="accent-color:var(--s);width:15px;height:15px"/> ${lbl}</label>`;
+  }).join('');
+}
+
+function buildDayCheckboxes() {
+  const container = document.getElementById('pa-days-checks');
+  container.innerHTML = DAYS.map((d,i) => {
+    const lbl = currentLang==='hi' ? d.hi : d.en;
+    return `<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);transition:all .15s"><input type="checkbox" id="pa-day-${i}" value="${d.en}" style="accent-color:var(--s);width:15px;height:15px"/> ${lbl}</label>`;
+  }).join('');
+}
+
+// ── LANGUAGE ─────────────────────────────────────────────────
+window.setLang = function(lang) {
+  currentLang = lang;
+  const t = T[lang];
+  const isHi = lang === 'hi';
+  const sidebarUser = document.getElementById('sidebar-user-name');
+  if (sidebarUser) sidebarUser.textContent = currentUser?.displayName || currentUser?.phoneNumber || '';
+
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', (b.textContent.includes('EN') && lang==='en') || (b.textContent.includes('हि') && lang==='hi') || (b.textContent === 'English' && lang==='en') || (b.textContent === 'हिंदी' && lang==='hi'));
+  });
+  document.body.classList.toggle('hi', isHi);
+
+  const s = (id, txt) => { const el=document.getElementById(id); if(el) el.innerHTML=txt; };
+  s('loader-text', t.loaderText);
+  s('l-title', t.loginTitle); s('l-sub', t.loginSub);
+  s('l-ph-lbl', t.lPhLbl); s('l-pw-lbl', t.lPwLbl);
+  s('l-btn', t.lBtn); s('l-sw', t.lSw);
+  s('r-title', t.regTitle); s('r-sub', t.regSub);
+  s('r-nm-lbl', t.rNmLbl); s('r-ph-lbl', t.rPhLbl);
+  s('r-pw-lbl', t.rPwLbl); s('r-cp-lbl', t.rCpLbl);
+  s('r-btn', t.rBtn); s('r-sw', t.rSw);
+  s('d-sub-txt', t.dSubTxt);
+  s('d-quick-lbl', `${t.dQuickLbl} <span style="font-weight:400;font-size:.9em"></span>`);
+  s('d-recent-lbl', t.dRecentLbl);
+  s('s-total-lbl', t.sTotalLbl); s('s-cities-lbl', t.sCitiesLbl); s('s-states-lbl', t.sStatesLbl);
+  s('dc1-t', t.dc1T); s('dc1-p', t.dc1P);
+  s('dc2-t', t.dc2T); s('dc2-p', t.dc2P);
+  s('dc3-t', t.dc3T); s('dc3-p', t.dc3P);
+  s('dc4-t', t.dc4T); s('dc4-p', t.dc4P);
+  ['d-logout-btn','dir-logout-btn','add-logout-btn','priest-logout-btn','priestadd-logout-btn'].forEach(id => s(id, t.logout));
+  ['dir-back-lbl','add-back-lbl'].forEach(id => s(id, t.backDash));
+  s('priest-back-lbl', t.backDash); s('priestadd-back-lbl', t.priestBackLbl);
+  s('dir-title', t.dirTitle); s('dir-add-btn', t.dirAddBtn);
+  s('f-name-lbl', t.fNameLbl); s('f-city-lbl', t.fCityLbl);
+  s('f-gotra-lbl', t.fGotraLbl); s('f-state-lbl', t.fStateLbl);
+  s('f-type-lbl', t.fTypeLbl); s('f-clear-btn', t.fClearBtn);
+  s('add-title', t.addTitle); s('add-sub', t.addSub);
+  s('a-nm-lbl', t.aNmLbl); s('a-gt-lbl', t.aGtLbl);
+  s('a-mb-lbl', t.aMbLbl); s('a-ct-lbl', t.aCtLbl);
+  s('a-st-lbl', t.aStLbl); s('a-tp-lbl', t.aTpLbl); s('a-em-lbl', t.aEmLbl);
+  s('a-oc-lbl', t.aOcLbl); s('a-ad-lbl', t.aAdLbl);
+  s('a-btn', t.aBtn); s('a-cancel-btn', t.aCancelBtn);
+  s('priest-title', t.priestTitle); s('priest-reg-btn', t.priestRegBtn);
+  s('pf-name-lbl', t.pfNameLbl); s('pf-city-lbl', t.pfCityLbl);
+  s('pf-state-lbl', t.pfStateLbl); s('pf-spec-lbl', t.pfSpecLbl);
+  s('pf-clear-btn', t.pfClearBtn);
+  s('priestadd-title', t.priestaddTitle); s('priestadd-sub', t.priestaddSub);
+  s('pa-nm-lbl', t.paNmLbl); s('pa-gt-lbl', t.paGtLbl);
+  s('pa-mb-lbl', t.paMbLbl); s('pa-ct-lbl', t.paCtLbl);
+  s('pa-st-lbl', t.paStLbl); s('pa-exp-lbl', t.paExpLbl);
+  s('pa-spec-lbl', t.paSpecLbl); s('pa-days-lbl', t.paDaysLbl);
+  s('pa-btn', t.paBtn); s('pa-cancel-btn', t.paCancelBtn);
+  s('sb-dashboard', t.sbDashboard); s('sb-directory', t.sbDirectory);
+  s('sb-priest', t.sbPriest); s('sb-add', t.sbAdd); s('sb-logout', t.sbLogout);
+
+  if (currentUser) {
+    s('d-welcome', t.welcomePrefix + (currentUser.displayName||'friend') + t.welcomeSuffix);
+  }
+  populateBrahminTypeSelects();
+  buildSpecCheckboxes();
+  buildDayCheckboxes();
+  if (allBrahmins.length) filterDir();
+  if (allPriests.length) filterPriests();
+};
+
+// ── HELPERS ──────────────────────────────────────────────────
+window.show = function(id) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  ['d-uname','dir-uname','add-uname','priest-uname'].forEach(n => {
+    const el = document.getElementById(n);
+    if (el && currentUser) el.textContent = currentUser.displayName || '';
+  });
+  const sidebarUser = document.getElementById('sidebar-user-name');
+  if (sidebarUser && currentUser) sidebarUser.textContent = currentUser.displayName || currentUser.phoneNumber || '';
+  if (id === 'pg-dash')       loadDashboard();
+  if (id === 'pg-dir')        loadDirectory();
+  if (id === 'pg-priest')     loadPriests();
+  if (id === 'pg-priest-add') { buildSpecCheckboxes(); buildDayCheckboxes(); }
+  window.scrollTo(0,0);
+};
+
+function alertMsg(id, msg, type='e') {
+  const el = document.getElementById(id);
+  el.innerHTML = (type==='e'?'⚠️ ':'✅ ') + msg;
+  el.className = 'alert on ' + (type==='s' ? 'as' : 'ae');
+}
+function clearAlert(id) { document.getElementById(id).className = 'alert'; }
+
+function setBtn(id, loading, label) {
+  const b = document.getElementById(id);
+  b.disabled = loading;
+  b.innerHTML = loading ? '<span class="sp"></span> ' + (currentLang==='hi'?'प्रतीक्षा करें...':'Please wait...') : label;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+const toEmail = p => `${p}@brahmin.directory`;
+
+// ── AUTH ─────────────────────────────────────────────────────
+window.doLogin = async function() {
+  const t = T[currentLang];
+  const phone = document.getElementById('l-phone').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  clearAlert('login-alert');
+  if (!/^\d{10}$/.test(phone)) return alertMsg('login-alert', t.errPhone);
+  if (!pass) return alertMsg('login-alert', t.errPass);
+  setBtn('l-btn', true, t.lBtn);
+  try {
+    await signInWithEmailAndPassword(auth, toEmail(phone), pass);
+  } catch(e) {
+    alertMsg('login-alert', e.code==='auth/invalid-credential' ? t.invalidCred : t.loginFail + e.message);
+    setBtn('l-btn', false, t.lBtn);
+  }
+};
+
+window.doRegister = async function() {
+  const t = T[currentLang];
+  const name  = document.getElementById('r-name').value.trim();
+  const phone = document.getElementById('r-phone').value.trim();
+  const pass  = document.getElementById('r-pass').value;
+  const conf  = document.getElementById('r-conf').value;
+  clearAlert('reg-alert');
+  if (!name)                   return alertMsg('reg-alert', t.errName);
+  if (!/^\d{10}$/.test(phone)) return alertMsg('reg-alert', t.errPhone);
+  if (pass.length < 6)         return alertMsg('reg-alert', t.errPass6);
+  if (pass !== conf)           return alertMsg('reg-alert', t.errMatch);
+  setBtn('r-btn', true, t.rBtn);
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, toEmail(phone), pass);
+    await updateProfile(cred.user, { displayName: name });
+    await cred.user.reload();
+  } catch(e) {
+    alertMsg('reg-alert', e.code==='auth/email-already-in-use' ? t.alreadyReg : t.regFail + e.message);
+    setBtn('r-btn', false, t.rBtn);
+  }
+};
+
+window.doLogout = async function() { await signOut(auth); };
+
+onAuthStateChanged(auth, user => {
+  document.getElementById('init-loader').style.display = 'none';
+  currentUser = user;
+  const t = T[currentLang];
+  if (user) {
+    document.getElementById('d-welcome').textContent = t.welcomePrefix + (user.displayName||'friend') + t.welcomeSuffix;
+    show('pg-dash');
+  } else {
+    show('pg-login');
+  }
+});
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function loadDashboard() {
+  const now = new Date();
+  document.getElementById('d-date').textContent = now.toLocaleDateString(currentLang==='hi'?'hi-IN':'en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  try {
+    const snap = await getDocs(collection(db, 'brahmins'));
+    const docs = snap.docs.map(d => d.data());
+    document.getElementById('s-total').textContent  = docs.length;
+    document.getElementById('s-cities').textContent = new Set(docs.map(d=>d.city).filter(Boolean)).size;
+    document.getElementById('s-states').textContent = new Set(docs.map(d=>d.state).filter(Boolean)).size;
+    const recent = docs.slice(-5).reverse();
+    const el = document.getElementById('d-recent');
+    const t = T[currentLang];
+    if (!recent.length) { el.innerHTML=`<p style="font-size:14px;color:var(--muted)">${t.noEntries}</p>`; return; }
+    el.innerHTML = recent.map(b => `
+      <div class="ri">
+        <div class="av">${b.name.charAt(0).toUpperCase()}</div>
+        <div style="flex:1">
+          <div class="ri-name">${b.name}</div>
+          <div class="ri-meta">📍 ${b.city}${b.state?', '+b.state:''}</div>
+        </div>
+        <span class="badge">${b.gotra||'—'}</span>
+      </div>`).join('');
+  } catch(e) { console.error(e); }
+}
+
+// ── DIRECTORY ─────────────────────────────────────────────────
+async function loadDirectory() {
+  try {
+    const snap = await getDocs(query(collection(db,'brahmins'), orderBy('createdAt','desc')));
+    allBrahmins = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    populateFilters();
+    filterDir();
+  } catch(e) { console.error(e); }
+}
+
+function populateFilters() {
+  const cities = [...new Set(allBrahmins.map(b=>b.city).filter(Boolean))].sort();
+  const gotras = [...new Set(allBrahmins.map(b=>b.gotra).filter(Boolean))].sort();
+  const states = [...new Set(allBrahmins.map(b=>b.state).filter(Boolean))].sort();
+  const fill = (id, arr, label) => {
+    const el = document.getElementById(id); const cur = el.value;
+    el.innerHTML = `<option value="">All ${label}</option>` + arr.map(v=>`<option${v===cur?' selected':''}>${v}</option>`).join('');
+  };
+  fill('f-city', cities, 'Cities'); fill('f-gotra', gotras, 'Gotras'); fill('f-state', states, 'States');
+  populateBrahminTypeSelects();
+}
+
+window.filterDir = function() {
+  const t = T[currentLang];
+  const name  = (document.getElementById('f-name').value||'').toLowerCase();
+  const city  = document.getElementById('f-city').value;
+  const gotra = document.getElementById('f-gotra').value;
+  const state = document.getElementById('f-state').value;
+  const type  = document.getElementById('f-type').value;
+  const filtered = allBrahmins.filter(b =>
+    (!name||b.name.toLowerCase().includes(name))&&
+    (!city||b.city===city)&&(!gotra||b.gotra===gotra)&&
+    (!state||b.state===state)&&(!type||b.brahminType===type));
+  document.getElementById('dir-rc').innerHTML =
+    `${t.showing} <strong>${filtered.length}</strong> ${t.of} <strong>${allBrahmins.length}</strong> ${t.members}`;
+  const grid = document.getElementById('dir-grid');
+  if (!filtered.length) {
+    grid.innerHTML=`<div class="empty"><div class="ico">🙏</div><p>${t.noResults}</p></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(b => `
+    <div class="bc">
+      <div class="bc-top">
+        <div class="bc-av">${b.name.charAt(0).toUpperCase()}</div>
+        <div><div class="bc-name">${b.name}</div>${b.gotra?`<span class="badge">🔱 ${b.gotra}</span>`:''}</div>
+      </div>
+      ${b.brahminType?`<div class="brow"><span class="badge" style="background:#FFF0E8;color:var(--sd);border-color:var(--sm)">${b.brahminType}</span></div>`:''}
+      <div class="brow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${b.city}${b.state?', '+b.state:''}</div>
+      <div class="brow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.4 1.14 2 2 0 012.18 1h3a2 2 0 012 1.72 12.05 12.05 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 8.36a16 16 0 006.72 6.72l1.62-1.62a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg><a href="tel:${b.mobile}">${b.mobile}</a></div>
+      ${b.email?`<div class="brow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:${b.email}">${b.email}</a></div>`:''}
+      ${b.occupation?`<div class="brow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>${b.occupation}</div>`:''}
+      ${b.address?`<div class="brow" style="font-size:12px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>${b.address}</div>`:''}
+    </div>`).join('');
+};
+
+window.clearFilters = function() {
+  ['f-name','f-city','f-gotra','f-state','f-type'].forEach(id => { document.getElementById(id).value=''; });
+  filterDir();
+};
+
+// ── ADD ───────────────────────────────────────────────────────
+window.doAdd = async function() {
+  const t = T[currentLang];
+  const name=document.getElementById('a-name').value.trim(),
+        gotra=document.getElementById('a-gotra').value.trim(),
+        mobile=document.getElementById('a-mobile').value.trim(),
+        city=document.getElementById('a-city').value.trim(),
+        state=document.getElementById('a-state').value,
+        brahminType=document.getElementById('a-type').value,
+        email=document.getElementById('a-email').value.trim(),
+        occ=document.getElementById('a-occ').value.trim(),
+        addr=document.getElementById('a-addr').value.trim();
+  clearAlert('add-alert');
+  if (!name)                    return alertMsg('add-alert', t.errName);
+  if (!gotra)                   return alertMsg('add-alert', t.errGotra);
+  if (!city)                    return alertMsg('add-alert', t.errCity);
+  if (!/^\d{10}$/.test(mobile)) return alertMsg('add-alert', t.errPhoneAdd);
+  setBtn('a-btn', true, t.aBtn);
+  try {
+    await addDoc(collection(db,'brahmins'), { name,gotra,city,state,brahminType,mobile,email,occupation:occ,address:addr,addedBy:currentUser.uid,createdAt:serverTimestamp() });
+    alertMsg('add-alert', t.addSuccess, 's');
+    ['a-name','a-gotra','a-mobile','a-city','a-email','a-occ','a-addr'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('a-state').value='';
+    document.getElementById('a-type').value='';
+    showToast(t.addSuccess);
+    setTimeout(() => show('pg-dir'), 2200);
+  } catch(e) { alertMsg('add-alert', t.addFail + e.message); }
+  finally { setBtn('a-btn', false, t.aBtn); }
+};
+
+// ── PRIEST DIRECTORY ──────────────────────────────────────────
+async function loadPriests() {
+  try {
+    const snap = await getDocs(query(collection(db,'priests'), orderBy('createdAt','desc')));
+    allPriests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    populatePriestFilters();
+    filterPriests();
+  } catch(e) { console.error(e); }
+}
+
+function populatePriestFilters() {
+  const cities = [...new Set(allPriests.map(p=>p.city).filter(Boolean))].sort();
+  const states = [...new Set(allPriests.map(p=>p.state).filter(Boolean))].sort();
+  const specs  = [...new Set(allPriests.flatMap(p=>p.specializations||[]))].sort();
+  const fill = (id, arr, def) => {
+    const el = document.getElementById(id); const cur = el.value;
+    el.innerHTML = `<option value="">${def}</option>` + arr.map(v=>`<option${v===cur?' selected':''}>${v}</option>`).join('');
+  };
+  const t = T[currentLang];
+  fill('pf-city', cities, t.pfCityLbl);
+  fill('pf-state', states, t.pfStateLbl);
+  fill('pf-spec', specs, t.pfSpecLbl);
+}
+
+window.filterPriests = function() {
+  const t = T[currentLang];
+  const name  = (document.getElementById('pf-name').value||'').toLowerCase();
+  const city  = document.getElementById('pf-city').value;
+  const state = document.getElementById('pf-state').value;
+  const spec  = document.getElementById('pf-spec').value;
+  const filtered = allPriests.filter(p =>
+    (!name||p.name.toLowerCase().includes(name))&&
+    (!city||p.city===city)&&(!state||p.state===state)&&
+    (!spec||(p.specializations||[]).includes(spec)));
+  document.getElementById('priest-rc').innerHTML =
+    `${t.showing} <strong>${filtered.length}</strong> ${t.of} <strong>${allPriests.length}</strong> ${t.priests}`;
+  const grid = document.getElementById('priest-grid');
+  if (!allPriests.length) {
+    grid.innerHTML=`<div class="empty"><div class="ico">🔱</div><p>${t.noPriests}</p></div>`;
+    return;
+  }
+  if (!filtered.length) {
+    grid.innerHTML=`<div class="empty"><div class="ico">🙏</div><p>${t.noPriestResults}</p></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(p => `
+    <div class="bc">
+      <div class="bc-top">
+        <div class="bc-av bc-av-priest">${p.name.charAt(0).toUpperCase()}</div>
+        <div>
+          <div class="bc-name">${p.name}</div>
+          ${p.gotra?`<span class="badge badge-priest">🔱 ${p.gotra}</span>`:''}
+        </div>
+      </div>
+      <div class="brow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${p.city}${p.state?', '+p.state:''}</div>
+      <div class="brow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.4 1.14 2 2 0 012.18 1h3a2 2 0 012 1.72 12.05 12.05 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 8.36a16 16 0 006.72 6.72l1.62-1.62a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg><a href="tel:${p.mobile}">${p.mobile}</a></div>
+      ${p.experience?`<div class="brow">⏳ ${p.experience} ${t.expYears}</div>`:''}
+      ${(p.specializations||[]).length?`<div style="margin-top:4px">${(p.specializations||[]).map(s=>`<span class="spec-tag">${s}</span>`).join('')}</div>`:''}
+      ${(p.availableDays||[]).length?`<div style="margin-top:4px;font-size:12px;color:var(--muted)">${t.available} ${(p.availableDays||[]).map(d=>`<span class="avail-tag">${d}</span>`).join('')}</div>`:''}
+    </div>`).join('');
+};
+
+window.clearPriestFilters = function() {
+  ['pf-name','pf-city','pf-state','pf-spec'].forEach(id => { document.getElementById(id).value=''; });
+  filterPriests();
+};
+
+window.doPriestAdd = async function() {
+  const t = T[currentLang];
+  const name=document.getElementById('pa-name').value.trim(),
+        gotra=document.getElementById('pa-gotra').value.trim(),
+        mobile=document.getElementById('pa-mobile').value.trim(),
+        city=document.getElementById('pa-city').value.trim(),
+        state=document.getElementById('pa-state').value,
+        experience=document.getElementById('pa-exp').value;
+  const specializations = SPECIALIZATIONS.map((s,i)=>document.getElementById(`pa-spec-${i}`)?.checked?s.en:null).filter(Boolean);
+  const availableDays   = DAYS.map((d,i)=>document.getElementById(`pa-day-${i}`)?.checked?d.en:null).filter(Boolean);
+  clearAlert('priestadd-alert');
+  if (!name)                    return alertMsg('priestadd-alert', t.errName);
+  if (!gotra)                   return alertMsg('priestadd-alert', t.errGotra);
+  if (!city)                    return alertMsg('priestadd-alert', t.errCity);
+  if (!/^\d{10}$/.test(mobile)) return alertMsg('priestadd-alert', t.errPhoneAdd);
+  if (!specializations.length)  return alertMsg('priestadd-alert', t.errSpecPriest);
+  setBtn('pa-btn', true, t.paBtn);
+  try {
+    await addDoc(collection(db,'priests'), { name,gotra,city,state,mobile,experience:experience?Number(experience):null,specializations,availableDays,addedBy:currentUser.uid,createdAt:serverTimestamp() });
+    alertMsg('priestadd-alert', t.priestAddSuccess, 's');
+    ['pa-name','pa-gotra','pa-mobile','pa-city','pa-exp'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('pa-state').value='';
+    buildSpecCheckboxes(); buildDayCheckboxes();
+    showToast(t.priestAddSuccess);
+    setTimeout(() => show('pg-priest'), 2200);
+  } catch(e) { alertMsg('priestadd-alert', t.priestAddFail + e.message); }
+  finally { setBtn('pa-btn', false, t.paBtn); }
+};
+
+// Init
+populateBrahminTypeSelects();
+buildSpecCheckboxes();
+buildDayCheckboxes();
+
+document.getElementById('l-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('l-phone').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>
