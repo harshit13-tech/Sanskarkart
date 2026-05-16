@@ -609,7 +609,7 @@ nav{background:rgba(255,252,248,.95);backdrop-filter:blur(12px);border-bottom:1p
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp }
+import { getFirestore, collection, addDoc, getDocs, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ✅ YOUR FIREBASE CONFIG
@@ -1018,8 +1018,8 @@ async function loadDashboard() {
 // ── DIRECTORY ─────────────────────────────────────────────────
 async function loadDirectory() {
   try {
-    const snap = await getDocs(query(collection(db,'brahmins'), orderBy('createdAt','desc')));
-    allBrahmins = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const snap = await getDocs(collection(db,'brahmins'));
+    allBrahmins = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
     populateFilters();
     filterDir();
   } catch(e) { console.error(e); }
@@ -1108,8 +1108,8 @@ window.doAdd = async function() {
 // ── PRIEST DIRECTORY ──────────────────────────────────────────
 async function loadPriests() {
   try {
-    const snap = await getDocs(query(collection(db,'priests'), orderBy('createdAt','desc')));
-    allPriests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const snap = await getDocs(collection(db,'priests'));
+    allPriests = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
     populatePriestFilters();
     filterPriests();
   } catch(e) { console.error(e); }
