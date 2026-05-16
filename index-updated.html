@@ -4,15 +4,12 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="theme-color" content="#E8660A"/>
-<meta http-equiv="x-dns-prefetch-control" content="on"/>
-<link rel="dns-prefetch" href="https://www.gstatic.com"/>
-<link rel="dns-prefetch" href="https://firestore.googleapis.com"/>
-<link rel="preconnect" href="https://www.gstatic.com" crossorigin/>
-<title>🕉️ Sanskarkart</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin/>
+<link rel="dns-prefetch" href="https://firestore.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@700&family=DM+Sans:wght@400;500;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
-<noscript><link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@700&family=DM+Sans:wght@400;500;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet"/></noscript>
+<title>🕉️ Sanskarkart</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -26,9 +23,9 @@
   --sh:0 2px 16px rgba(232,102,10,.10);
   --sh2:0 8px 40px rgba(232,102,10,.18);
 }
-body{font-family:var(--fb);background:var(--surface);color:var(--deep);min-height:100vh;font-size:15px;overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeSpeed}
+body{font-family:var(--fb);background:var(--surface);color:var(--deep);min-height:100vh;font-size:15px;overflow-x:hidden}
 .hi{font-family:var(--fhi)!important}
-.pg{display:none;min-height:100vh;flex-direction:column;animation:fadeIn .25s ease;will-change:opacity}
+.pg{display:none;min-height:100vh;flex-direction:column;animation:fadeIn .35s ease}
 .pg.on{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--s),var(--gold));z-index:200}
@@ -634,15 +631,29 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// ✅ ENABLE OFFLINE CACHE — makes repeat visits instant
-enableIndexedDbPersistence(db).catch(() => {});
+// ✅ OFFLINE CACHE — repeat visits are instant
+enableIndexedDbPersistence(db).catch(()=>{});
 
 let currentUser = null;
 let allBrahmins = [];
 let allPriests  = [];
 let currentLang = 'en';
-let brahminsCached = false;
-let priestsCached  = false;
+let dataLoaded  = false; // track if we already fetched data
+
+// ── PRE-FETCH DATA AS SOON AS POSSIBLE ───────────────────────
+// Start fetching data immediately — don't wait for login to complete
+async function prefetchData() {
+  try {
+    const snap = await getDocs(collection(db,'brahmins'));
+    allBrahmins = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    dataLoaded = true;
+    // If dashboard is already visible, update it immediately
+    if (document.getElementById('pg-dash').classList.contains('on')) {
+      renderDashboardStats();
+    }
+  } catch(e) { console.error('Prefetch error:',e); }
+}
 
 // ── BRAHMIN TYPES ─────────────────────────────────────────────
 const BRAHMIN_TYPES_EN = [
@@ -997,6 +1008,8 @@ onAuthStateChanged(auth, user => {
   const t = T[currentLang];
   if (user) {
     document.getElementById('d-welcome').textContent = t.welcomePrefix + (user.displayName||'friend') + t.welcomeSuffix;
+    // Start fetching data immediately in background
+    prefetchData();
     show('pg-dash');
   } else {
     show('pg-login');
@@ -1004,46 +1017,68 @@ onAuthStateChanged(auth, user => {
 });
 
 // ── DASHBOARD ─────────────────────────────────────────────────
+function renderDashboardStats() {
+  // Never show 0 — only update when we have real data
+  if (!allBrahmins.length) return;
+  document.getElementById('s-total').textContent  = allBrahmins.length;
+  document.getElementById('s-cities').textContent = new Set(allBrahmins.map(d=>d.city).filter(Boolean)).size;
+  document.getElementById('s-states').textContent = new Set(allBrahmins.map(d=>d.state).filter(Boolean)).size;
+  const t = T[currentLang];
+  const recent = allBrahmins.slice(0,5);
+  const el = document.getElementById('d-recent');
+  if (!recent.length) { el.innerHTML=`<p style="font-size:14px;color:var(--muted)">${t.noEntries}</p>`; return; }
+  el.innerHTML = recent.map(b => `
+    <div class="ri">
+      <div class="av">${b.name.charAt(0).toUpperCase()}</div>
+      <div style="flex:1">
+        <div class="ri-name">${b.name}</div>
+        <div class="ri-meta">📍 ${b.city}${b.state?', '+b.state:''}</div>
+      </div>
+      <span class="badge">${b.gotra||'—'}</span>
+    </div>`).join('');
+}
+
 async function loadDashboard() {
   const now = new Date();
-  document.getElementById('d-date').textContent = now.toLocaleDateString(currentLang==='hi'?'hi-IN':'en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('d-date').textContent = now.toLocaleDateString(
+    currentLang==='hi'?'hi-IN':'en-IN',
+    {weekday:'long',year:'numeric',month:'long',day:'numeric'}
+  );
+  // If data already loaded (from prefetch), show instantly
+  if (dataLoaded) {
+    renderDashboardStats();
+    return;
+  }
+  // Otherwise show loading dots and fetch
+  document.getElementById('s-total').textContent  = '...';
+  document.getElementById('s-cities').textContent = '...';
+  document.getElementById('s-states').textContent = '...';
+  document.getElementById('d-recent').innerHTML = '<p style="font-size:14px;color:var(--muted)">Loading...</p>';
   try {
-    // reuse cached data if available — no extra Firestore read
-    const docs = brahminsCached ? allBrahmins.map(d=>d) : (await getDocs(collection(db,'brahmins'))).docs.map(d=>d.data());
-    if (!brahminsCached) {
-      allBrahmins = (await getDocs(collection(db,'brahmins'))).docs.map(d=>({id:d.id,...d.data()}));
-      brahminsCached = true;
-    }
-    document.getElementById('s-total').textContent  = allBrahmins.length;
-    document.getElementById('s-cities').textContent = new Set(allBrahmins.map(d=>d.city).filter(Boolean)).size;
-    document.getElementById('s-states').textContent = new Set(allBrahmins.map(d=>d.state).filter(Boolean)).size;
-    const recent = [...allBrahmins].slice(0,5);
-    const el = document.getElementById('d-recent');
-    const t = T[currentLang];
-    if (!recent.length) { el.innerHTML=`<p style="font-size:14px;color:var(--muted)">${t.noEntries}</p>`; return; }
-    el.innerHTML = recent.map(b => `
-      <div class="ri">
-        <div class="av">${b.name.charAt(0).toUpperCase()}</div>
-        <div style="flex:1">
-          <div class="ri-name">${b.name}</div>
-          <div class="ri-meta">📍 ${b.city}${b.state?', '+b.state:''}</div>
-        </div>
-        <span class="badge">${b.gotra||'—'}</span>
-      </div>`).join('');
-  } catch(e) { console.error('Dashboard error:',e); }
+    const snap = await getDocs(collection(db,'brahmins'));
+    allBrahmins = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    dataLoaded = true;
+    renderDashboardStats();
+  } catch(e) {
+    console.error('Dashboard error:',e);
+    document.getElementById('s-total').textContent  = '—';
+    document.getElementById('s-cities').textContent = '—';
+    document.getElementById('s-states').textContent = '—';
+  }
 }
 
 // ── DIRECTORY ─────────────────────────────────────────────────
 async function loadDirectory() {
-  // use cache if already loaded
-  if (brahminsCached && allBrahmins.length) { populateFilters(); filterDir(); return; }
+  if (dataLoaded && allBrahmins.length) {
+    populateFilters(); filterDir(); return;
+  }
   try {
     const snap = await getDocs(collection(db,'brahmins'));
-    allBrahmins = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    allBrahmins = snap.docs.map(d=>({id:d.id,...d.data()}))
       .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    brahminsCached = true;
-    populateFilters();
-    filterDir();
+    dataLoaded = true;
+    populateFilters(); filterDir();
   } catch(e) { console.error('Directory error:',e); }
 }
 
@@ -1129,14 +1164,12 @@ window.doAdd = async function() {
 
 // ── PRIEST DIRECTORY ──────────────────────────────────────────
 async function loadPriests() {
-  if (priestsCached && allPriests.length) { populatePriestFilters(); filterPriests(); return; }
+  if (allPriests.length) { populatePriestFilters(); filterPriests(); return; }
   try {
     const snap = await getDocs(collection(db,'priests'));
-    allPriests = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    allPriests = snap.docs.map(d=>({id:d.id,...d.data()}))
       .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    priestsCached = true;
-    populatePriestFilters();
-    filterPriests();
+    populatePriestFilters(); filterPriests();
   } catch(e) { console.error(e); }
 }
 
