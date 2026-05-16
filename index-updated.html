@@ -189,7 +189,16 @@ nav{background:rgba(255,252,248,.95);backdrop-filter:blur(12px);border-bottom:1p
 .back{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);cursor:pointer;margin-bottom:1.75rem;background:none;border:none;font-family:var(--fb);padding:6px 10px 6px 0;transition:color .15s}
 .back:hover{color:var(--s)}
 
-/* SPINNER */
+/* AUTO LOGOUT WARNING */
+#autologout-warning{position:fixed;inset:0;background:rgba(30,15,0,.6);z-index:999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#autologout-warning.show{display:flex}
+.al-box{background:var(--card);border:1px solid var(--border);border-radius:var(--rxl);padding:2rem 2.25rem;max-width:360px;width:90%;text-align:center;box-shadow:var(--sh2);animation:fadeIn .25s ease}
+.al-box .al-icon{font-size:3rem;margin-bottom:.75rem}
+.al-box h3{font-family:var(--fh);font-size:1.5rem;font-weight:700;margin-bottom:.5rem;color:var(--deep)}
+.al-box p{font-size:14px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6}
+.al-countdown{font-family:var(--fh);font-size:2.5rem;font-weight:700;color:var(--s);margin-bottom:1.25rem}
+.al-btns{display:flex;gap:10px}
+.al-btns .btn{flex:1}
 .sp{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -280,6 +289,20 @@ nav{background:rgba(255,252,248,.95);backdrop-filter:blur(12px);border-bottom:1p
     <button class="sidebar-link sidebar-link-logout" onclick="doLogout();closeSidebar()">
       <span class="sl-ico">🚪</span><span class="sl-lbl" id="sb-logout">Logout</span>
     </button>
+  </div>
+</div>
+
+<!-- AUTO LOGOUT WARNING -->
+<div id="autologout-warning">
+  <div class="al-box">
+    <div class="al-icon">⏰</div>
+    <h3 id="al-title">Still there?</h3>
+    <p id="al-msg">You've been inactive for 5 minutes. You will be logged out in:</p>
+    <div class="al-countdown" id="al-countdown">30</div>
+    <div class="al-btns">
+      <button class="btn bs" onclick="doLogout()">🚪 <span id="al-logout-btn">Logout Now</span></button>
+      <button class="btn bp" onclick="resetAutoLogout()">✋ <span id="al-stay-btn">Stay Logged In</span></button>
+    </div>
   </div>
 </div>
 
@@ -655,7 +678,80 @@ async function prefetchData() {
   } catch(e) { console.error('Prefetch error:',e); }
 }
 
-// ── BRAHMIN TYPES ─────────────────────────────────────────────
+// ── AUTO LOGOUT SYSTEM ───────────────────────────────────────
+const INACTIVE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+const WARNING_DURATION = 30;             // 30 second countdown
+let inactivityTimer  = null;
+let countdownTimer   = null;
+let countdownSeconds = WARNING_DURATION;
+
+function resetAutoLogout() {
+  // Hide warning if showing
+  document.getElementById('autologout-warning').classList.remove('show');
+  clearInterval(countdownTimer);
+  countdownSeconds = WARNING_DURATION;
+  document.getElementById('al-countdown').textContent = WARNING_DURATION;
+  // Reset inactivity timer
+  clearTimeout(inactivityTimer);
+  if (currentUser) {
+    inactivityTimer = setTimeout(showLogoutWarning, INACTIVE_TIMEOUT);
+  }
+}
+
+function showLogoutWarning() {
+  if (!currentUser) return;
+  document.getElementById('autologout-warning').classList.add('show');
+  countdownSeconds = WARNING_DURATION;
+  document.getElementById('al-countdown').textContent = countdownSeconds;
+  clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    countdownSeconds--;
+    document.getElementById('al-countdown').textContent = countdownSeconds;
+    if (countdownSeconds <= 0) {
+      clearInterval(countdownTimer);
+      document.getElementById('autologout-warning').classList.remove('show');
+      doLogout();
+    }
+  }, 1000);
+}
+
+function startAutoLogout() {
+  // Track ALL user activity
+  const events = ['mousemove','mousedown','keydown','touchstart','touchmove','scroll','click'];
+  events.forEach(e => document.addEventListener(e, resetAutoLogout, { passive: true }));
+  resetAutoLogout(); // start the timer
+}
+
+function stopAutoLogout() {
+  clearTimeout(inactivityTimer);
+  clearInterval(countdownTimer);
+  document.getElementById('autologout-warning').classList.remove('show');
+}
+
+// ── CLOSE TAB / BROWSER LOGOUT ────────────────────────────────
+// Logout when tab/browser is closed
+window.addEventListener('beforeunload', () => {
+  if (currentUser) {
+    // Use sendBeacon to ensure it fires before page unloads
+    signOut(auth);
+  }
+});
+
+// Also logout when tab becomes hidden for too long (phone lock screen etc)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    // Start a 5 min timer when tab is hidden
+    inactivityTimer = setTimeout(() => {
+      if (document.hidden && currentUser) doLogout();
+    }, INACTIVE_TIMEOUT);
+  } else {
+    // Tab visible again — reset timer
+    clearTimeout(inactivityTimer);
+    if (currentUser) resetAutoLogout();
+  }
+});
+
+window.resetAutoLogout = resetAutoLogout;
 const BRAHMIN_TYPES_EN = [
   'Maithili Brahmin','Bengali Brahmin','Tamil Brahmin','Telugu Brahmin',
   'Kashmiri Brahmin','Kannada Brahmin','Maharashtra Brahmin','Gujarat Brahmin',
@@ -911,6 +1007,18 @@ window.setLang = function(lang) {
   s('pa-btn', t.paBtn); s('pa-cancel-btn', t.paCancelBtn);
   s('sb-dashboard', t.sbDashboard); s('sb-directory', t.sbDirectory);
   s('sb-priest', t.sbPriest); s('sb-add', t.sbAdd); s('sb-logout', t.sbLogout);
+  // Auto logout warning text
+  if (lang === 'hi') {
+    s('al-title', 'क्या आप अभी भी हैं?');
+    s('al-msg', 'आप 5 मिनट से निष्क्रिय हैं। आप इतने समय में लॉग आउट हो जाएंगे:');
+    s('al-logout-btn', 'अभी लॉग आउट');
+    s('al-stay-btn', 'लॉग इन रहें');
+  } else {
+    s('al-title', 'Still there?');
+    s('al-msg', 'You\'ve been inactive for 5 minutes. You will be logged out in:');
+    s('al-logout-btn', 'Logout Now');
+    s('al-stay-btn', 'Stay Logged In');
+  }
 
   if (currentUser) {
     s('d-welcome', t.welcomePrefix + (currentUser.displayName||'friend') + t.welcomeSuffix);
@@ -1008,10 +1116,11 @@ onAuthStateChanged(auth, user => {
   const t = T[currentLang];
   if (user) {
     document.getElementById('d-welcome').textContent = t.welcomePrefix + (user.displayName||'friend') + t.welcomeSuffix;
-    // Start fetching data immediately in background
     prefetchData();
+    startAutoLogout(); // ✅ start 5-min inactivity timer
     show('pg-dash');
   } else {
+    stopAutoLogout();  // ✅ stop timer on logout
     show('pg-login');
   }
 });
